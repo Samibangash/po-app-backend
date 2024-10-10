@@ -15,17 +15,22 @@ public class ApprovalWorkflowController {
     @Autowired
     private ApprovalWorkflowService workflowService;
 
+ 
+
     @PostMapping("/create")
     public ResponseEntity<ApprovalWorkflow> createWorkflow(@RequestParam Long poId, @RequestParam Long userId, @RequestParam Integer approvalLevel) {
-        ApprovalWorkflow workflow = workflowService.createApprovalWorkflow(poId, userId, approvalLevel);
+        ApprovalWorkflow workflow = workflowService.firstOrCreateApprovalWorkflow(poId, userId, approvalLevel);
         return ResponseEntity.ok(workflow);
     }
 
+
     @PutMapping("/{workflowId}/approve")
     public ResponseEntity<ApprovalWorkflow> approveWorkflow(@PathVariable Long workflowId) {
+        System.out.println("Creating PO: " + workflowId);
         ApprovalWorkflow workflow = workflowService.approveWorkflow(workflowId);
         return ResponseEntity.ok(workflow);
     }
+    
 
     @PutMapping("/{workflowId}/reject")
     public ResponseEntity<ApprovalWorkflow> rejectWorkflow(@PathVariable Long workflowId) {

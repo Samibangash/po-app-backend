@@ -1,8 +1,9 @@
 databaseChangeLog:
   - changeSet:
       id: 1
-      author: yourname
+      author: Sami
       changes:
+        # Create the 'user' table
         - createTable:
             tableName: user
             columns:
@@ -21,7 +22,73 @@ databaseChangeLog:
               - column:
                   name: role
                   type: VARCHAR(255)
+              - column:
+                  name: role_name
+                  type: VARCHAR(255)
 
+  - changeSet:
+      id: 2
+      author: yourname
+      changes:
+        # Insert predefined user roles
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: username
+                  value: "team_lead"
+              - column:
+                  name: password
+                  value: "password123"
+              - column:
+                  name: role
+                  value: 1
+              - column:
+                  name: role_name
+                  value: "Team Lead"
+
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: username
+                  value: "department_manager"
+              - column:
+                  name: password
+                  value: "password123"
+              - column:
+                  name: role
+                  value: 2
+              - column:
+                  name: role_name
+                  value: "Department Manager"
+
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  value: 3
+              - column:
+                  name: username
+                  value: "finance_manager"
+              - column:
+                  name: password
+                  value: "password123"
+              - column:
+                  name: role
+                  value: 3
+              - column:
+                  name: role_name
+                  value: "Finance Manager"
+
+        # Create the 'purchase_order' table
         - createTable:
             tableName: purchase_order
             columns:
@@ -41,6 +108,7 @@ databaseChangeLog:
                   name: status
                   type: VARCHAR(50)
 
+        # Create the 'approval_workflow' table with foreign keys referencing 'user' and 'purchase_order'
         - createTable:
             tableName: approval_workflow
             columns:
@@ -56,6 +124,8 @@ databaseChangeLog:
                   constraints:
                     foreignKeyName: fk_po
                     referencedTableName: purchase_order
+                    referencedColumnNames: id
+                    nullable: false
               - column:
                   name: approval_level
                   type: INT
@@ -65,6 +135,8 @@ databaseChangeLog:
                   constraints:
                     foreignKeyName: fk_user
                     referencedTableName: user
+                    referencedColumnNames: id
+                    nullable: false
               - column:
                   name: status
                   type: VARCHAR(50)

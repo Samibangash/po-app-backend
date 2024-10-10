@@ -1,0 +1,43 @@
+<!-- src/main/resources/db/changelog/seed-data.xml -->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Insert predefined users with roles -->
+    <changeSet id="seed-users-with-roles-001" author="yourname">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM user;
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="user">
+            <column name="id" valueNumeric="1"/>
+            <column name="username" value="team_lead"/>
+            <column name="password" value="password123"/>
+            <column name="role" value="Team Lead"/>
+        </insert>
+
+        <insert tableName="user">
+            <column name="id" valueNumeric="2"/>
+            <column name="username" value="department_manager"/>
+            <column name="password" value="password123"/>
+            <column name="role" value="Department Manager"/>
+        </insert>
+
+        <insert tableName="user">
+            <column name="id" valueNumeric="3"/>
+            <column name="username" value="finance_manager"/>
+            <column name="password" value="password123"/>
+            <column name="role" value="Finance Manager"/>
+        </insert>
+
+        <rollback>
+            DELETE FROM user WHERE id IN (1, 2, 3);
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

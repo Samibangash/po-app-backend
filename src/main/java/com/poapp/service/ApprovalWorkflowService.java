@@ -15,6 +15,29 @@ import java.util.List;
 @Service
 public class ApprovalWorkflowService {
 
+    // @Autowired
+    // private ApprovalWorkflowRepository workflowRepository;
+
+    // @Autowired
+    // private PurchaseOrderRepository poRepository;
+
+    // @Autowired
+    // private UserRepository userRepository;
+
+    // public ApprovalWorkflow createApprovalWorkflow(Long poId, Long userId, Integer approvalLevel) {
+    //     PurchaseOrder po = poRepository.findById(poId).orElseThrow(() -> new RuntimeException("PO not found"));
+    //     User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+    //     ApprovalWorkflow workflow = new ApprovalWorkflow();
+    //     workflow.setPurchaseOrder(po);
+    //     workflow.setUser(user);
+    //     workflow.setApprovalLevel(approvalLevel);
+    //     workflow.setStatus("Pending");
+
+
+    //     return workflowRepository.save(workflow);
+    // }
+
     @Autowired
     private ApprovalWorkflowRepository workflowRepository;
 
@@ -24,24 +47,28 @@ public class ApprovalWorkflowService {
     @Autowired
     private UserRepository userRepository;
 
-    public ApprovalWorkflow createApprovalWorkflow(Long poId, Long userId, Integer approvalLevel) {
+    public ApprovalWorkflow firstOrCreateApprovalWorkflow(Long poId, Long userId, Integer approvalLevel) {
         PurchaseOrder po = poRepository.findById(poId).orElseThrow(() -> new RuntimeException("PO not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        ApprovalWorkflow workflow = new ApprovalWorkflow();
-        workflow.setPurchaseOrder(po);
-        workflow.setUser(user);
-        workflow.setApprovalLevel(approvalLevel);
-        workflow.setStatus("Pending");
+        // Check if the workflow already exists
+        ApprovalWorkflow existingWorkflow = workflowRepository
+            .findByPurchaseOrderAndUserAndApprovalLevel(po, user, approvalLevel);
 
-        // ApprovalWorkflow workflow = new ApprovalWorkflow();
-        // workflow.setPurchaseOrder(po);  // This will work now
-        // workflow.setUser(user);          // This will work now
-        // workflow.setApprovalLevel(approvalLevel);  // This will work now
-        // workflow.setStatus("Pending");
+        if (existingWorkflow != null) {
+            // If workflow exists, update the status or any other fields if necessary
+            existingWorkflow.setStatus("Pending"); // or any other status you want to reset to
+            return workflowRepository.save(existingWorkflow);
+        }
 
+        // If workflow does not exist, create a new one
+        ApprovalWorkflow newWorkflow = new ApprovalWorkflow();
+        newWorkflow.setPurchaseOrder(po);
+        newWorkflow.setUser(user);
+        newWorkflow.setApprovalLevel(approvalLevel);
+        newWorkflow.setStatus("Pending");
 
-        return workflowRepository.save(workflow);
+        return workflowRepository.save(newWorkflow);
     }
 
     public List<ApprovalWorkflow> getApprovalWorkflowsByPoId(Long poId) {
@@ -59,4 +86,5 @@ public class ApprovalWorkflowService {
         workflow.setStatus("Rejected");
         return workflowRepository.save(workflow);
     }
+    
 }

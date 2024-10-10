@@ -1,27 +1,16 @@
-package com.poapp.model;
+package com.poapp.dto;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-@Entity
-@Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")  
-public class PurchaseOrder {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PurchaseOrderDTO {
     private Long id;
-
     private String description;
     private BigDecimal totalAmount;
     private String status;
-
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ApprovalWorkflow> approvalWorkflows;
+    
+    // List of ApprovalWorkflowDTOs
+    private List<ApprovalWorkflowDTO> approvalWorkflows;
 
     // Getters and Setters
     public Long getId() {
@@ -32,7 +21,7 @@ public class PurchaseOrder {
         this.id = id;
     }
 
-    
+
     public String getDescription() {
         return description;
     }
@@ -57,11 +46,11 @@ public class PurchaseOrder {
         this.status = status;
     }
 
-    public List<ApprovalWorkflow> getApprovalWorkflows() {
+    public List<ApprovalWorkflowDTO> getApprovalWorkflows() {
         return approvalWorkflows;
     }
 
-    public void setApprovalWorkflows(List<ApprovalWorkflow> approvalWorkflows) {
+    public void setApprovalWorkflows(List<ApprovalWorkflowDTO> approvalWorkflows) {
         this.approvalWorkflows = approvalWorkflows;
     }
 }
