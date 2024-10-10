@@ -22,6 +22,7 @@ public interface ApprovalWorkflowRepository extends JpaRepository<ApprovalWorkfl
 
     // Other repository methods
     List<ApprovalWorkflow> findAllByPurchaseOrderId(Long poId);
+    
 }
 
 
