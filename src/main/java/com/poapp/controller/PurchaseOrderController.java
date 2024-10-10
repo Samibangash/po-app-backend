@@ -28,14 +28,7 @@ public ResponseEntity<ApiResponse<PurchaseOrderDTO>> createPurchaseOrder(@Reques
    PurchaseOrder createdPO = poService.createPurchaseOrder(po);
    PurchaseOrderDTO createdPODTO = dtoMapper.toPurchaseOrderDTO(createdPO);
    
-   // Return the success response
-   // Assuming PurchaseOrderDTO is the DTO object for PurchaseOrder
-// @ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
-//     "Success",                    // Response status
-//     HttpStatus.OK.value(),         // HTTP status code
-//     createdPODTO,                  // Data (created PurchaseOrderDTO)
-//     true                           // Success flag
-// );
+
         ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
             "Success", 
             HttpStatus.OK.value(), 
@@ -47,9 +40,17 @@ public ResponseEntity<ApiResponse<PurchaseOrderDTO>> createPurchaseOrder(@Reques
 
 }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<PurchaseOrder> updatePOStatus(@PathVariable Long id, @RequestParam String status) {
+    @PutMapping(value = "/{id}/status", consumes = "application/json")
+    public ResponseEntity<ApiResponse<PurchaseOrderDTO>> updatePOStatus(@PathVariable Long id, @RequestParam String status) {
         PurchaseOrder updatedPO = poService.updatePOStatus(id, status);
-        return ResponseEntity.ok(updatedPO);
+        PurchaseOrderDTO updatedPODTO = dtoMapper.toPurchaseOrderDTO(updatedPO);
+        ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
+            "Success", 
+            HttpStatus.OK.value(), 
+            updatedPODTO, 
+            true
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
