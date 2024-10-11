@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")  
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class PurchaseOrder {
 
     @Id
@@ -17,8 +17,13 @@ public class PurchaseOrder {
     private Long id;
 
     private String description;
+    private String po_number;
     private BigDecimal totalAmount;
     private String status;
+
+    // One PurchaseOrder can have many Items with cascading and orphan removal
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ApprovalWorkflow> approvalWorkflows;
@@ -32,7 +37,6 @@ public class PurchaseOrder {
         this.id = id;
     }
 
-    
     public String getDescription() {
         return description;
     }
@@ -55,6 +59,22 @@ public class PurchaseOrder {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPoNumber() {
+        return po_number;
+    }
+
+    public void setPoNumber(String po_number) {
+        this.po_number = po_number;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
     public List<ApprovalWorkflow> getApprovalWorkflows() {

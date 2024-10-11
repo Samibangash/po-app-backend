@@ -30,7 +30,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 2
-      author: yourname
+      author: Sami
       changes:
         # Insert predefined user roles
         - insert:
@@ -41,13 +41,33 @@ databaseChangeLog:
                   value: 1
               - column:
                   name: username
-                  value: "team_lead"
+                  value: "Admin"
               - column:
                   name: password
-                  value: "password123"
+                  value: "$2a$10$wA9Agx.nfkRv8X2EbBNsxe2wi8farJaL08iix8fLctk4lwXbFwG8G"
               - column:
                   name: role
                   value: 1
+              - column:
+                  name: role_name
+                  value: "Admin"
+
+        # Insert predefined user roles
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: username
+                  value: "team_lead"
+              - column:
+                  name: password
+                  value: "$2a$10$wA9Agx.nfkRv8X2EbBNsxe2wi8farJaL08iix8fLctk4lwXbFwG8G"
+              - column:
+                  name: role
+                  value: 2
               - column:
                   name: role_name
                   value: "Team Lead"
@@ -57,16 +77,16 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  value: 2
+                  value: 3
               - column:
                   name: username
                   value: "department_manager"
               - column:
                   name: password
-                  value: "password123"
+                  value: "$2a$10$wA9Agx.nfkRv8X2EbBNsxe2wi8farJaL08iix8fLctk4lwXbFwG8G"
               - column:
                   name: role
-                  value: 2
+                  value: 3
               - column:
                   name: role_name
                   value: "Department Manager"
@@ -76,16 +96,16 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  value: 3
+                  value: 4
               - column:
                   name: username
                   value: "finance_manager"
               - column:
                   name: password
-                  value: "password123"
+                  value: "$2a$10$wA9Agx.nfkRv8X2EbBNsxe2wi8farJaL08iix8fLctk4lwXbFwG8G"
               - column:
                   name: role
-                  value: 3
+                  value: 4
               - column:
                   name: role_name
                   value: "Finance Manager"
@@ -104,12 +124,49 @@ databaseChangeLog:
                   name: description
                   type: VARCHAR(255)
               - column:
+                  name: po_number
+                  type: VARCHAR(255)
+
+              - column:
                   name: total_amount
                   type: DECIMAL(10, 2)
               - column:
                   name: status
                   type: VARCHAR(50)
 
+        # Create the 'item' table with foreign key to 'purchase_order'
+        - createTable:
+            tableName: item
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: item_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
+                  type: DECIMAL(10, 2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: po_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_item_po
+                    referencedTableName: purchase_order
+                    referencedColumnNames: id
+                    nullable: true
         # Create the 'approval_workflow' table with foreign keys referencing 'user' and 'purchase_order'
         - createTable:
             tableName: approval_workflow

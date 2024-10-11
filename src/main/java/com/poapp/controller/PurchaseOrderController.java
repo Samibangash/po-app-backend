@@ -1,14 +1,28 @@
 package com.poapp.controller;
 
+import com.itextpdf.text.DocumentException;
 import com.poapp.common.ApiResponse;
 import com.poapp.dto.PurchaseOrderDTO;
 import org.springframework.http.ResponseEntity;
 import com.poapp.mapper.DTOMapper;
+import com.poapp.model.Item;
 import com.poapp.model.PurchaseOrder;
+import com.poapp.service.PdfService;
 import com.poapp.service.PurchaseOrderService;
+import java.io.ByteArrayOutputStream;
+import org.springframework.http.MediaType;
+
+
+
+import io.jsonwebtoken.io.IOException;
+
 import java.util.List;  // Correct import for List
 import java.util.stream.Collectors;  // For stream operations
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,25 +38,28 @@ public class PurchaseOrderController {
 
     @Autowired
     private PurchaseOrderService poService;
+    
+
 
     @PostMapping(value = "/create", consumes = "application/json")
     public ResponseEntity<ApiResponse<PurchaseOrderDTO>> createPurchaseOrder(@RequestBody PurchaseOrderDTO poDTO) {
-    // Create and save the purchase order
-    PurchaseOrder po = dtoMapper.toPurchaseOrderEntity(poDTO);
-    PurchaseOrder createdPO = poService.createPurchaseOrder(po);
-    PurchaseOrderDTO createdPODTO = dtoMapper.toPurchaseOrderDTO(createdPO);
-    
-
-            ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
-                "Success", 
-                HttpStatus.OK.value(), 
-                createdPODTO, 
+        PurchaseOrder po = dtoMapper.toPurchaseOrderEntity(poDTO);
+        List<Item> items = poDTO.getItems().stream()
+                                .map(dtoMapper::toItemEntity)
+                                .collect(Collectors.toList());
+        PurchaseOrder createdPO = poService.createPurchaseOrder(po, items);
+        PurchaseOrderDTO createdPODTO = dtoMapper.toPurchaseOrderDTO(createdPO);
+        ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
+                "Success",
+                HttpStatus.OK.value(),
+                createdPODTO,
                 true
-            );
+        );
 
-            return ResponseEntity.ok(response);
-
+        return ResponseEntity.ok(response);
     }
+
+    
 
     @PutMapping(value = "/{id}/status", consumes = "application/json")
     public ResponseEntity<ApiResponse<PurchaseOrderDTO>> updatePOStatus(@PathVariable Long id, @RequestParam String status) {
@@ -151,6 +168,41 @@ public class PurchaseOrderController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/generate-pdf/{id}")
+public ResponseEntity<ByteArrayResource> generatePdf(@PathVariable Long id) {
+    try {
+        PurchaseOrder po = poService.getPurchaseOrderById(id); // Fetch PO by ID
+        if (po == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(null); // Return 404 if PO not found
+        }
+
+        // Generate PDF as ByteArrayOutputStream
+        ByteArrayOutputStream pdfStream = new ByteArrayOutputStream();
+        pdfService.generatePdf(pdfStream, po);  // Use the stream for PDF generation
+
+        // Convert the PDF to ByteArrayResource
+        ByteArrayResource resource = new ByteArrayResource(pdfStream.toByteArray());
+
+        // Set appropriate headers for PDF download
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "PO-" + po.getPoNumber() + ".pdf");
+
+        return ResponseEntity.ok()
+            .headers(headers)
+            .contentLength(resource.contentLength())
+            .body(resource);  // Return the PDF as ByteArrayResource
+    } catch (DocumentException | IOException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+}
 
 
     

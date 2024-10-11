@@ -4,7 +4,7 @@ import com.poapp.common.ApiResponse;
 // import com.poapp.config.CustomAuthenticationManager;
 import com.poapp.dto.AuthRequest;
 import com.poapp.dto.AuthResponse;
-import com.poapp.dto.PurchaseOrderDTO;
+import com.poapp.dto.UserDTO;
 import com.poapp.model.User;
 import com.poapp.service.UserDetailsServiceImpl;
 import com.poapp.service.UserService;
@@ -39,7 +39,7 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
     String errorType = "Validation Error";
     String stackTrace = bindingResult.getAllErrors().toString();  // Collect validation error details
     
-    ApiResponse<PurchaseOrderDTO> response = new ApiResponse<>(
+    ApiResponse<UserDTO> response = new ApiResponse<>(
         "Invalid Input", 
         HttpStatus.BAD_REQUEST.value(), 
         errorType, 
@@ -56,10 +56,10 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
         ApiResponse<String> response = new ApiResponse<>(
             "Conflict", 
             HttpStatus.CONFLICT.value(), 
-            "UsernameAlreadyTakenError",  // Error type for clarity
-            "The username you tried to register is already in use", // Error message or stack trace
-            null,  // No data as it's an error case
-            false  // Error, so success is false
+            "UsernameAlreadyTakenError", 
+            "The username you tried to register is already in use",
+            null,  
+            false  
         );
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
@@ -71,8 +71,8 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
     ApiResponse<User> response = new ApiResponse<>(
         "Success", 
         HttpStatus.OK.value(), 
-        registeredUser,  // Data object for the successfully registered user
-        true  // Success status is true
+        registeredUser,  
+        true  
     );
     
     return ResponseEntity.ok(response);
@@ -95,47 +95,47 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
 
     
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-public ResponseEntity<ApiResponse<AuthResponse>> createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
-    try {
-        // Authenticate the user
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-        );
-    } catch (BadCredentialsException e) {
-        ApiResponse<AuthResponse> response = new ApiResponse<>(
-            "Unauthorized", 
-            HttpStatus.UNAUTHORIZED.value(), 
-            "AuthenticationError",  // Error type for clarity
-            "Incorrect username or password",  // Detailed error message
-            null,  // No data as it's an error case
-            false  // Error, so success is false
-        );
-        
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    public ResponseEntity<ApiResponse<AuthResponse>> createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
+        try {
+            // Authenticate the user
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            ApiResponse<AuthResponse> response = new ApiResponse<>(
+                "Unauthorized", 
+                HttpStatus.UNAUTHORIZED.value(), 
+                "AuthenticationError",  // Error type for clarity
+                "Incorrect username or password",  // Detailed error message
+                null,  // No data as it's an error case
+                false  // Error, so success is false
+            );
+            
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // Load user details
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        // Generate JWT
+        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+        // Fetch the complete User object from the UserService
+        User user = userService.findByUsername(authRequest.getUsername());
+
+        // Prepare the AuthResponse with JWT and user details
+        AuthResponse authResponse = new AuthResponse(jwt, user);
+
+        // Prepare the API response
+    ApiResponse<AuthResponse> response = new ApiResponse<>(
+        "Success", 
+        HttpStatus.OK.value(), 
+        authResponse,  // Data object that includes authentication details (like tokens)
+        true  // Success flag is true
+    );
+
+    return ResponseEntity.ok(response);
+
     }
-
-    // Load user details
-    final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-    // Generate JWT
-    final String jwt = jwtUtil.generateToken(userDetails.getUsername());
-
-    // Fetch the complete User object from the UserService
-    User user = userService.findByUsername(authRequest.getUsername());
-
-    // Prepare the AuthResponse with JWT and user details
-    AuthResponse authResponse = new AuthResponse(jwt, user);
-
-    // Prepare the API response
-ApiResponse<AuthResponse> response = new ApiResponse<>(
-    "Success", 
-    HttpStatus.OK.value(), 
-    authResponse,  // Data object that includes authentication details (like tokens)
-    true  // Success flag is true
-);
-
-return ResponseEntity.ok(response);
-
-}
 
 
 }

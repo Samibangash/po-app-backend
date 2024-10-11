@@ -2,7 +2,6 @@ package com.poapp.controller;
 
 import com.poapp.common.ApiResponse;
 import com.poapp.dto.ApprovalWorkflowDTO;
-import com.poapp.dto.PurchaseOrderDTO;
 import com.poapp.mapper.DTOMapper;
 import com.poapp.model.ApprovalWorkflow;
 import com.poapp.service.ApprovalWorkflowService;
