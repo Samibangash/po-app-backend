@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
 
     @Autowired
@@ -92,6 +93,7 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public ResponseEntity<ApiResponse<AuthResponse>> createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
     try {

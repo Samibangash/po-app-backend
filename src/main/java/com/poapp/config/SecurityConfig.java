@@ -12,21 +12,25 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Disable CSRF and enable access without authentication
-        http.csrf().disable()
-            .authorizeRequests()
-            .anyRequest().permitAll();
-        
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors()  // Enable CORS to use the WebConfig settings
+            .and()
+            .csrf(csrf -> csrf.disable())  // Disable CSRF protection
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()  // Allow unauthenticated access to /api/auth/**
+                .anyRequest().authenticated()  // All other routes require authentication
+            );
         return http.build();
     }
 
-    // Temporary in-memory user for testing
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails user = User.withUsername("user")
@@ -36,13 +40,11 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(user);
     }
 
-    // Define a PasswordEncoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Define the AuthenticationManager bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

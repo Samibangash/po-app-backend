@@ -35,7 +35,6 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;  // Correct import for List
-import java.util.stream.Collectors;  // For stream operations
 
 
 @Service

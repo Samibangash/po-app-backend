@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.poapp.common.ApiResponse;
 
 import java.time.LocalDateTime;
 
@@ -61,5 +64,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorResponse);
+    }
+
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<String>> handleNoResourceFoundException(NoResourceFoundException ex) {
+        ApiResponse<String> response = new ApiResponse<>(
+            "Resource Not Found",
+            HttpStatus.NOT_FOUND.value(),
+            "NoResourceFoundException",
+            ex.getMessage(),
+            null,
+            false
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
