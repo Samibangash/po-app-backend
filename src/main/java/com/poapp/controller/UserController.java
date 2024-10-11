@@ -21,7 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
+import java.util.List;
 
 
 @RestController
@@ -117,10 +117,11 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
         // Load user details
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         // Generate JWT
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+        User user = userService.findByUsername(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(userDetails.getUsername(),user.getRole(),user.getRoleName());
 
         // Fetch the complete User object from the UserService
-        User user = userService.findByUsername(authRequest.getUsername());
+        // User user = userService.findByUsername(authRequest.getUsername());
 
         // Prepare the AuthResponse with JWT and user details
         AuthResponse authResponse = new AuthResponse(jwt, user);
@@ -136,6 +137,34 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
     return ResponseEntity.ok(response);
 
     }
+
+    // GET endpoint to retrieve users by role
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse<?>> getUsersByRole(@RequestParam String role) {
+        List<User> users = userService.getUsersByRole(role);
+    
+        if (users.isEmpty()) {
+            ApiResponse<String> response = new ApiResponse<>(
+                "No users found",            
+                HttpStatus.NO_CONTENT.value(),
+                "NoDataError",               
+                "No users available for the provided role", 
+                null,                        
+                false                     
+            );
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        }
+    
+        ApiResponse<List<?>> response = new ApiResponse<>(
+            "Success", 
+            HttpStatus.OK.value(), 
+            users,  
+            true  
+        );
+    
+        return ResponseEntity.ok(response);
+    }
+    
 
 
 }

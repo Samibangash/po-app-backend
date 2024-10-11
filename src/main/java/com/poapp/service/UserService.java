@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.poapp.model.User;
 import com.poapp.repository.UserRepository;
-
+import java.util.List;
 @Service
 public class UserService {
 
@@ -16,6 +16,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+    // Method to get users by their role
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
+    }
     public User registerUser(User user) {
         // Encrypt the password before saving the user
         user.setPassword(passwordEncoder.encode(user.getPassword()));
