@@ -6,6 +6,7 @@ import com.poapp.repository.PurchaseOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 
 import java.util.List;
@@ -42,6 +43,12 @@ String latestPoNumber = latestPoNumbers.isEmpty() ? null : latestPoNumbers.get(0
                 .orElseThrow(() -> new RuntimeException("PO not found"));
     }
 
+    // public PurchaseOrder getPurchaseOrderByIdAndUserId(Long orderId, Long userId) {
+    //     return poRepository.findByIdAndUserId(orderId, userId);
+    // }
+    
+    
+
     public PurchaseOrder updatePOStatus(Long poId, String status) {
         PurchaseOrder po = getPurchaseOrderById(poId);
         po.setStatus(status);
@@ -51,6 +58,10 @@ String latestPoNumber = latestPoNumbers.isEmpty() ? null : latestPoNumbers.get(0
     public List<PurchaseOrder> getAllPurchaseOrders() {
         return poRepository.findAll();
     }
+    public List<PurchaseOrder> getPurchaseOrderByIdAndUserId(Long userId) {
+        return poRepository.findByUserId(userId);
+    }
+    
 
     public List<PurchaseOrder> getPurchaseOrdersByStatus(String status) {
         return poRepository.findByStatus(status);

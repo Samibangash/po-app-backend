@@ -71,6 +71,8 @@ public class DTOMapper {
         PurchaseOrderDTO poDTO = new PurchaseOrderDTO();
         poDTO.setId(aw.getPurchaseOrder().getId());
         poDTO.setDescription(aw.getPurchaseOrder().getDescription());
+        poDTO.setTotalAmount(aw.getPurchaseOrder().getTotalAmount());
+        // poDTO.setUser(userDTO(aw.getPurchaseOrder().getUser()));
         dto.setPurchaseOrder(poDTO);
 
         return dto;
@@ -131,6 +133,7 @@ public class DTOMapper {
         dto.setTotalAmount(po.getTotalAmount());
         dto.setPoNumber(po.getPoNumber());
         dto.setStatus(po.getStatus());
+        dto.setUser(toUserDTO(po.getUser()));
 
         // Convert List<Item> to List<ItemDTO>
         if (po.getItems() != null) {
@@ -168,6 +171,7 @@ public class DTOMapper {
         po.setTotalAmount(poDTO.getTotalAmount());
         po.setPoNumber(poDTO.getPoNumber());
         po.setStatus(poDTO.getStatus());
+        po.setUser(toUserEntity(poDTO.getUser()));
 
         // Convert List<ItemDTO> to List<Item>
         if (poDTO.getItems() != null) {

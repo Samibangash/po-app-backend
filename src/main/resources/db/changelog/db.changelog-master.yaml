@@ -126,7 +126,13 @@ databaseChangeLog:
               - column:
                   name: po_number
                   type: VARCHAR(255)
-
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_purchase_order_user
+                    referencedTableName: user
+                    referencedColumnNames: id
               - column:
                   name: total_amount
                   type: DECIMAL(10, 2)

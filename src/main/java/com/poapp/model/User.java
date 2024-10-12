@@ -30,6 +30,10 @@ public class User {
     private List<ApprovalWorkflow> approvalWorkflows;
     
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Removed @JsonManagedReference
+    private List<PurchaseOrder> purchaseOrders;
+    
     // Getters
     public Integer getId() {
         return id;

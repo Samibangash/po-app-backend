@@ -28,6 +28,11 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ApprovalWorkflow> approvalWorkflows;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -83,5 +88,13 @@ public class PurchaseOrder {
 
     public void setApprovalWorkflows(List<ApprovalWorkflow> approvalWorkflows) {
         this.approvalWorkflows = approvalWorkflows;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -43,6 +43,16 @@ public class JwtUtil {
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
+    // public Integer extractUserId(String token) {
+    //     return Integer.parseInt(extractClaim(token, claims -> claims.get("id").toString())); // Convert to String and parse as Integer
+    // }
+    
+    public String extractUserId(String token) {
+        // Logic to extract userId
+        Integer userId = Integer.parseInt(extractClaim(token, claims -> claims.get("username").toString()));
+        return userId.toString(); // Convert to String and return
+    }
+    
 
     // public String generateToken(String username, String role, String roleName, Integer id) {
     //     Map<String, Object> claims = new HashMap<>();

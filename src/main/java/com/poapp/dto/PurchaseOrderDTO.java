@@ -9,6 +9,7 @@ public class PurchaseOrderDTO {
     private String po_number;
     private BigDecimal totalAmount;
     private String status;
+    private UserDTO user;  
     private List<ItemDTO> items;
     // List of ApprovalWorkflowDTOs
     private List<ApprovalWorkflowDTO> approvalWorkflows;
@@ -67,5 +68,13 @@ public class PurchaseOrderDTO {
 
     public void setItems(List<ItemDTO> items) {
         this.items = items;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 }
