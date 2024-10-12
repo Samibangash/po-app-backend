@@ -72,15 +72,22 @@ mvn spring-boot:run
 - **Response**:
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": {
       "jwt": "string",
       "user": {
         "id": "integer",
         "username": "string",
-        "role": "string"
+        "password": "string (hashed)",
+        "role": "integer",
+        "roleName": "string or null"
       }
-    }
+    },
+    "success": true
   }
   ```
 
@@ -91,19 +98,26 @@ mvn spring-boot:run
   ```json
   {
     "username": "string",
-    "password": "string",
-    "role": "string"
+    "password": "string"
   }
   ```
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": {
       "id": "integer",
       "username": "string",
-      "role": "string"
-    }
+      "password": "string (hashed)",
+      "role": "integer",
+      "roleName": "string or null"
+    },
+    "success": true
   }
   ```
 
@@ -115,22 +129,28 @@ mvn spring-boot:run
 - **Request Parameters**:
   - `role` (string): The role of the users to fetch.
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": [
       {
         "id": "integer",
         "username": "string",
         "role": "string"
       }
-    ]
+    ],
+    "success": true
   }
   ```
 
 ### Purchase Orders
 
-#### POST `/api/purchase-orders`
+#### POST `/api/po/create`
 
 - **Description**: Create a new purchase order.
 - **Request Body**:
@@ -148,9 +168,14 @@ mvn spring-boot:run
   }
   ```
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": {
       "id": "integer",
       "description": "string",
@@ -163,19 +188,25 @@ mvn spring-boot:run
           "price": "number"
         }
       ]
-    }
+    },
+    "success": true
   }
   ```
 
-#### GET `/api/purchase-orders`
+#### GET `/api/po`
 
 - **Description**: Fetch all purchase orders or filter by status.
 - **Request Parameters** (optional):
   - `status` (string): The status to filter purchase orders by (e.g., Pending, Approved, Rejected).
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": [
       {
         "id": "integer",
@@ -190,11 +221,12 @@ mvn spring-boot:run
           }
         ]
       }
-    ]
+    ],
+    "success": true
   }
   ```
 
-#### GET `/api/purchase-orders/{id}`
+#### GET `/api/po/{id}`
 
 - **Description**: Fetch a purchase order by its ID.
 - **Request Parameters**:
@@ -202,32 +234,44 @@ mvn spring-boot:run
 - **Response**:
   ```json
   {
-    "status": "Success",
-    "data": {
-      "id": "integer",
-      "description": "string",
-      "totalAmount": "number",
-      "status": "string",
-      "items": [
-        {
-          "name": "string",
-          "quantity": "number",
-          "price": "number"
-        }
-      ]
-    }
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
+    "data": [
+      {
+        "id": "integer",
+        "description": "string",
+        "totalAmount": "number",
+        "status": "string",
+        "items": [
+          {
+            "name": "string",
+            "quantity": "number",
+            "price": "number"
+          }
+        ]
+      }
+    ],
+    "success": true
   }
   ```
 
-#### PUT `/api/purchase-orders/{id}/approve`
+#### PUT `/api/po/{id}/status?status=Approve`
 
 - **Description**: Approve a purchase order.
 - **Request Parameters**:
   - `id` (long): The ID of the purchase order.
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": {
       "id": "integer",
       "description": "string",
@@ -240,19 +284,25 @@ mvn spring-boot:run
           "price": "number"
         }
       ]
-    }
+    },
+    "success": true
   }
   ```
 
-#### PUT `/api/purchase-orders/{id}/reject`
+#### PUT `/api/po/{id}/reject`
 
 - **Description**: Reject a purchase order.
 - **Request Parameters**:
   - `id` (long): The ID of the purchase order.
 - **Response**:
+
   ```json
   {
-    "status": "Success",
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
     "data": {
       "id": "integer",
       "description": "string",
@@ -265,7 +315,187 @@ mvn spring-boot:run
           "price": "number"
         }
       ]
-    }
+    },
+    "success": true
+  }
+  ```
+
+### Approval Workflow
+
+#### POST `/api/workflow/create`
+
+- **Description**: Create a new approval workflow for a Purchase Order.
+- **Request Parameters**:
+  - `poId` (Long): The ID of the Purchase Order.
+  - `userId` (Long): The ID of the user.
+  - `approvalLevel` (Integer): The approval level for the workflow.
+- **Response**:
+
+  ```json
+  {
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
+    "data": {
+      "id": "integer",
+      "poId": "integer",
+      "userId": "integer",
+      "approvalLevel": "integer",
+      "status": "string"
+    },
+    "success": true
+  }
+  ```
+
+## Workflow Approval API
+
+### **PUT** `/api/workflow/{workflowId}/approve`
+
+- **Description**: Approves the current level of the approval workflow for a specified Purchase Order (PO).
+
+- **Request Parameters**:
+
+  - `workflowId` (Long): The ID of the workflow to be approved.
+
+- **Response**:
+
+  ```json
+  {
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
+    "data": {
+      "id": "integer",
+      "approvalLevel": "integer",
+      "status": "Approved",
+      "user": {
+        "id": "integer",
+        "username": "string",
+        "role": "integer",
+        "roleName": "string"
+      },
+      "purchaseOrder": {
+        "id": "integer",
+        "description": "string",
+        "totalAmount": "decimal or null",
+        "status": "string or null",
+        "items": "array of items or null",
+        "approvalWorkflows": "array of approval workflows or null",
+        "poNumber": "string or null"
+      }
+    },
+    "success": true
+  }
+  ```
+
+  ### **POST** `/api/workflow/create`
+
+- **Description**: Creates a new approval workflow for a specified Purchase Order (PO).
+- **Request Parameters (Query Params)**:
+
+  - `poId` (Long): The ID of the Purchase Order for which the approval workflow is being created.
+  - `userId` (Long): The ID of the user responsible for the approval at the specified level.
+  - `approvalLevel` (Integer): The level of approval (e.g., 1 for Team Lead, 2 for Department Manager, 3 for Finance Manager).
+
+- **Response**:
+
+  ```json
+  {
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
+    "data": {
+      "id": "integer",
+      "user": {
+        "id": "integer",
+        "username": "string",
+        "role": "integer",
+        "roleName": "string"
+      },
+      "purchaseOrder": {
+        "id": "integer",
+        "description": "string",
+        "totalAmount": "decimal",
+        "status": "string",
+        "items": [
+          {
+            "id": "integer",
+            "itemName": "string",
+            "quantity": "integer",
+            "price": "decimal",
+            "purchaseOrder": "integer"
+          }
+        ],
+        "approvalWorkflows": [
+          {
+            "id": "integer",
+            "user": {
+              "id": "integer",
+              "username": "string",
+              "role": "integer",
+              "roleName": "string"
+            },
+            "purchaseOrder": "integer",
+            "approvalLevel": "integer",
+            "status": "string"
+          }
+        ],
+        "poNumber": "string"
+      },
+      "approvalLevel": "integer",
+      "status": "string"
+    },
+    "success": true
+  }
+  ```
+
+  ## Get Workflow Details API
+
+### **GET** `/api/workflow/{workflowId}`
+
+- **Description**: Retrieves the details of a specific approval workflow for a Purchase Order (PO) based on the provided workflow ID.
+
+- **Path Parameters**:
+
+  - `workflowId` (Long): The ID of the workflow to retrieve.
+
+- **Response**:
+  ```json
+  {
+    "responseStatus": "Success",
+    "responseCode": 200,
+    "errorType": null,
+    "stackTrace": null,
+    "timestamp": "ISO 8601 formatted timestamp",
+    "data": [
+      {
+        "id": "integer",
+        "approvalLevel": "integer",
+        "status": "string",
+        "user": {
+          "id": "integer",
+          "username": "string",
+          "role": "integer",
+          "roleName": "string"
+        },
+        "purchaseOrder": {
+          "id": "integer",
+          "description": "string",
+          "totalAmount": "decimal or null",
+          "status": "string or null",
+          "items": "array of items or null",
+          "approvalWorkflows": "array of approval workflows or null",
+          "poNumber": "string or null"
+        }
+      }
+    ],
+    "success": true
   }
   ```
 
