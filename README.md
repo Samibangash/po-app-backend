@@ -22,7 +22,7 @@ This is the backend of the Purchase Order Management System built using Spring B
 
 - Java 23+
 - Maven 3+
-- PostgreSQL or any supported database
+- MySql or any supported database
 
 ## Installation
 
