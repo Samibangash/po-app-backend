@@ -15,6 +15,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
+    
     // Use a secure key for HS256
     private Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
@@ -43,13 +44,23 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, String role, String roleName) {
+    // public String generateToken(String username, String role, String roleName, Integer id) {
+    //     Map<String, Object> claims = new HashMap<>();
+    //     claims.put("role", role); // Add role to claims
+    //     claims.put("role_name", roleName); // Add role_name to claims
+    //     claims.put("id", id); // Add role_name to claims
+    //     return createToken(claims, username);
+    // }
+
+    public String generateToken(String username, String role, String roleName, Integer id) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role); // Add role to claims
         claims.put("role_name", roleName); // Add role_name to claims
-        return createToken(claims, username);
+        claims.put("id", id); // Add id to claims
+        return createToken(claims, username); // Create and return the token
     }
     
+
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
@@ -57,7 +68,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours expiration
-                .signWith(SECRET_KEY) // Use the secure key
+                .signWith(SECRET_KEY)
                 .compact();
     }
 

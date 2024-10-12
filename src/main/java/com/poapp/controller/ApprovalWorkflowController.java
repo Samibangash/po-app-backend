@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -74,6 +76,7 @@ public class ApprovalWorkflowController {
         List<ApprovalWorkflow> workflows = workflowService.getApprovalWorkflowsByPoId(poId);
         
         
+        
         ApiResponse<List<ApprovalWorkflow>> response = new ApiResponse<>(
             "Success", 
             HttpStatus.OK.value(), 
@@ -83,4 +86,24 @@ public class ApprovalWorkflowController {
 
     return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{userID}")
+    public ResponseEntity<ApiResponse<List<ApprovalWorkflowDTO>>> getWorkflowsByUserId(@PathVariable("userID") Long userId) {
+        List<ApprovalWorkflow> workflows = workflowService.getApprovalWorkflowsByUserId(userId);
+        // ApprovalWorkflowDTO updatedDTO = dtoMapper.toApprovalWorkflowDTO(workflows);
+        List<ApprovalWorkflowDTO> updatedDTOs = workflows.stream()
+            .map(dtoMapper::toApprovalWorkflowDTO)
+            .collect(Collectors.toList());
+
+        ApiResponse<List<ApprovalWorkflowDTO>> response = new ApiResponse<>(
+            "Success",
+            HttpStatus.OK.value(),
+            updatedDTOs,
+            true
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

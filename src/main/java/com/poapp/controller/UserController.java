@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -94,49 +95,43 @@ public ResponseEntity<ApiResponse<?>> registerUser(@Validated @RequestBody User 
     private AuthenticationManager authenticationManager;
 
     
+   @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<AuthResponse>> createAuthenticationToken(@RequestBody AuthRequest authRequest) throws Exception {
-        try {
-            // Authenticate the user
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            ApiResponse<AuthResponse> response = new ApiResponse<>(
-                "Unauthorized", 
-                HttpStatus.UNAUTHORIZED.value(), 
-                "AuthenticationError",  // Error type for clarity
-                "Incorrect username or password",  // Detailed error message
-                null,  // No data as it's an error case
-                false  // Error, so success is false
-            );
-            
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        
+        if (authRequest.getUsername() == null || authRequest.getUsername().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>("Bad Request", HttpStatus.BAD_REQUEST.value(), "ValidationError", "Username is required", null, false));
         }
 
-        // Load user details
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        // Generate JWT
-        User user = userService.findByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername(),user.getRole(),user.getRoleName());
+        if (authRequest.getPassword() == null || authRequest.getPassword().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>("Bad Request", HttpStatus.BAD_REQUEST.value(), "ValidationError", "Password is required", null, false));
+        }
 
-        // Fetch the complete User object from the UserService
-        // User user = userService.findByUsername(authRequest.getUsername());
+        try {
+            User user = userService.findByUsername(authRequest.getUsername());
 
-        // Prepare the AuthResponse with JWT and user details
-        AuthResponse authResponse = new AuthResponse(jwt, user);
+            if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("Unauthorized", HttpStatus.UNAUTHORIZED.value(), "AuthenticationError", "Incorrect username or password", null, false));
+            }
 
-        // Prepare the API response
-    ApiResponse<AuthResponse> response = new ApiResponse<>(
-        "Success", 
-        HttpStatus.OK.value(), 
-        authResponse,  // Data object that includes authentication details (like tokens)
-        true  // Success flag is true
-    );
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 
-    return ResponseEntity.ok(response);
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), user.getRole(), user.getRoleName(),user.getId());
 
+            AuthResponse authResponse = new AuthResponse(jwt, user);
+
+            ApiResponse<AuthResponse> response = new ApiResponse<>("Success", HttpStatus.OK.value(), authResponse, true);
+            return ResponseEntity.ok(response);
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("Unauthorized", HttpStatus.UNAUTHORIZED.value(), "AuthenticationError", "Incorrect username or password", null, false));
+        }
     }
+
+
 
     // GET endpoint to retrieve users by role
     @GetMapping("/users")

@@ -44,6 +44,20 @@ public class DTOMapper {
     }
 
     // Convert ApprovalWorkflow entity to ApprovalWorkflowDTO
+    // public ApprovalWorkflowDTO toApprovalWorkflowDTO(ApprovalWorkflow aw) {
+    //     if (aw == null) return null;
+
+    //     ApprovalWorkflowDTO dto = new ApprovalWorkflowDTO();
+    //     dto.setId(aw.getId());
+    //     dto.setApprovalLevel(aw.getApprovalLevel());
+    //     dto.setStatus(aw.getStatus());
+    //     dto.setUser(toUserDTO(aw.getUser())); // Map user to UserDTO
+    //     dto.setPurchaseOrder(toPurchaseOrderDTO(aw.getPurchaseOrder()));
+    //     return dto;
+    // }
+
+    
+    // Convert ApprovalWorkflow entity to ApprovalWorkflowDTO (Partial Mapping)
     public ApprovalWorkflowDTO toApprovalWorkflowDTO(ApprovalWorkflow aw) {
         if (aw == null) return null;
 
@@ -52,8 +66,17 @@ public class DTOMapper {
         dto.setApprovalLevel(aw.getApprovalLevel());
         dto.setStatus(aw.getStatus());
         dto.setUser(toUserDTO(aw.getUser())); // Map user to UserDTO
+
+        // Instead of mapping the full PurchaseOrderDTO, map only required fields to avoid cyclic dependency
+        PurchaseOrderDTO poDTO = new PurchaseOrderDTO();
+        poDTO.setId(aw.getPurchaseOrder().getId());
+        poDTO.setDescription(aw.getPurchaseOrder().getDescription());
+        dto.setPurchaseOrder(poDTO);
+
         return dto;
     }
+
+
 
     // Convert ApprovalWorkflowDTO to ApprovalWorkflow entity
     public ApprovalWorkflow toApprovalWorkflowEntity(ApprovalWorkflowDTO awDTO) {
@@ -68,7 +91,38 @@ public class DTOMapper {
     }
 
      // Convert PurchaseOrder entity to PurchaseOrderDTO
-     public PurchaseOrderDTO toPurchaseOrderDTO(PurchaseOrder po) {
+    //  public PurchaseOrderDTO toPurchaseOrderDTO(PurchaseOrder po) {
+    //     if (po == null) return null;
+
+    //     PurchaseOrderDTO dto = new PurchaseOrderDTO();
+    //     dto.setId(po.getId());
+    //     dto.setDescription(po.getDescription());
+    //     dto.setTotalAmount(po.getTotalAmount());
+    //     dto.setPoNumber(po.getPoNumber());
+    //     dto.setStatus(po.getStatus());
+
+    //     // Convert List<Item> to List<ItemDTO>
+    //     if (po.getItems() != null) {
+    //         List<ItemDTO> itemDTOs = po.getItems().stream()
+    //             .map(this::toItemDTO)
+    //             .collect(Collectors.toList());
+    //         dto.setItems(itemDTOs);
+    //     }
+    //     // Convert List<ApprovalWorkflow> to List<ApprovalWorkflowDTO>
+    //     if (po.getApprovalWorkflows() != null) {
+    //         List<ApprovalWorkflowDTO> awDTOs = po.getApprovalWorkflows().stream()
+    //             .map(this::toApprovalWorkflowDTO)
+    //             .collect(Collectors.toList());
+    //         dto.setApprovalWorkflows(awDTOs);
+    //     }
+
+
+    //     return dto;
+    // }
+
+
+    // Convert PurchaseOrder entity to PurchaseOrderDTO (Partial Mapping)
+    public PurchaseOrderDTO toPurchaseOrderDTO(PurchaseOrder po) {
         if (po == null) return null;
 
         PurchaseOrderDTO dto = new PurchaseOrderDTO();
@@ -85,14 +139,21 @@ public class DTOMapper {
                 .collect(Collectors.toList());
             dto.setItems(itemDTOs);
         }
-        // Convert List<ApprovalWorkflow> to List<ApprovalWorkflowDTO>
+
+        // Map only necessary fields for ApprovalWorkflows to avoid recursion
         if (po.getApprovalWorkflows() != null) {
             List<ApprovalWorkflowDTO> awDTOs = po.getApprovalWorkflows().stream()
-                .map(this::toApprovalWorkflowDTO)
+                .map(aw -> {
+                    ApprovalWorkflowDTO awDTO = new ApprovalWorkflowDTO();
+                    awDTO.setId(aw.getId());
+                    awDTO.setApprovalLevel(aw.getApprovalLevel());
+                    awDTO.setStatus(aw.getStatus());
+                    awDTO.setUser(toUserDTO(aw.getUser()));
+                    return awDTO;
+                })
                 .collect(Collectors.toList());
             dto.setApprovalWorkflows(awDTOs);
         }
-
 
         return dto;
     }
