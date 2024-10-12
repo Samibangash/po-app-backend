@@ -12,15 +12,15 @@ This is the backend of the Purchase Order Management System built using Spring B
 
 ## Tech Stack
 
-- Java 17+
+- Java 23+
 - Spring Boot 3.x
-- PostgreSQL (or any database)
+- MySql (or any database)
 - Liquibase for database migrations
 - JWT for security
 
 ## Prerequisites
 
-- Java 17+
+- Java 23+
 - Maven 3+
 - PostgreSQL or any supported database
 
