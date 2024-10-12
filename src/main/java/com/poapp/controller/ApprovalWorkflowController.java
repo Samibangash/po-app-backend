@@ -74,7 +74,7 @@ public class ApprovalWorkflowController {
     @GetMapping("/po/{poId}")
     public ResponseEntity<ApiResponse<List<ApprovalWorkflow>>> getWorkflowsByPoId(@PathVariable Long poId) {
         List<ApprovalWorkflow> workflows = workflowService.getApprovalWorkflowsByPoId(poId);
-        
+        // ApprovalWorkflowDTO updatedDTO = dtoMapper.toApprovalWorkflowDTO(workflows);
         
         
         ApiResponse<List<ApprovalWorkflow>> response = new ApiResponse<>(
